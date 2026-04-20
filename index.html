@@ -449,6 +449,8 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
     let finished = false;
     let highlights = [];
     let isAnimating = false;
+    let currentInterval = null;
+    let currentTimeout = null;
 
     function escapeHtml(str) {
       return str
@@ -459,26 +461,6 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
         .replaceAll("'", '&#039;');
     }
 
-    function buildFinalHighlights(text, items) {
-      const results = [];
-      let searchFrom = 0;
-      items.forEach((item) => {
-        const start = text.indexOf(item.to, searchFrom);
-        if (start === -1) return;
-        results.push({
-          start,
-          end: start + item.to.length,
-          from: item.from,
-          to: item.to,
-          why: item.why
-        });
-        searchFrom = start + item.to.length;
-      });
-      return results;
-    }
-
-    const finalHighlights = buildFinalHighlights(finalImprovedText, changes);
-
     function switchPhoto(after) {
       profilePhoto.classList.add('fade');
       setTimeout(() => {
@@ -487,14 +469,46 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
       }, 300);
     }
 
-    function renderText(text, activeHighlights) {
+    function updateProgress() {
+      const progress = Math.round((currentStep / changes.length) * 100);
+      progressBar.style.width = (started ? progress : 0) + '%';
+      statusText.textContent = started
+        ? (finished ? 'Improvement complete' : `Improving... ${progress}%`)
+        : 'Ready to improve';
+    }
+
+    function recalcHighlights(text, appliedChanges) {
+      const results = [];
+      let searchFrom = 0;
+
+      appliedChanges.forEach((item) => {
+        const start = text.indexOf(item.to, searchFrom);
+        if (start === -1) return;
+
+        results.push({
+          start,
+          end: start + item.to.length,
+          from: item.from,
+          to: item.to,
+          why: item.why
+        });
+
+        searchFrom = start + item.to.length;
+      });
+
+      return results;
+    }
+
+    function renderText(text, appliedChanges) {
       const paragraphs = text.split('\n\n');
+      const recalculatedHighlights = recalcHighlights(text, appliedChanges);
       let globalOffset = 0;
 
       essayContainer.innerHTML = paragraphs.map((paragraph, pIndex) => {
         const paragraphStart = globalOffset;
         const paragraphEnd = paragraphStart + paragraph.length;
-        const paragraphHighlights = activeHighlights
+
+        const paragraphHighlights = recalculatedHighlights
           .filter((h) => h.start < paragraphEnd && h.end > paragraphStart)
           .map((h) => ({
             ...h,
@@ -544,21 +558,13 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
       }).join('');
     }
 
-    function updateProgress() {
-      const progress = Math.round((currentStep / changes.length) * 100);
-      progressBar.style.width = (started ? progress : 0) + '%';
-      statusText.textContent = started
-        ? (finished ? 'Improvement complete' : `Improving... ${progress}%`)
-        : 'Ready to improve';
-    }
-
     function animateNextChange() {
       if (!started || finished) return;
 
       if (currentStep >= changes.length) {
         finished = true;
         displayText = finalImprovedText;
-        highlights = [...finalHighlights];
+        highlights = [...changes];
         renderText(displayText, highlights);
         updateProgress();
         isAnimating = false;
@@ -571,7 +577,7 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
       if (start === -1) {
         currentStep += 1;
         updateProgress();
-        setTimeout(animateNextChange, 180);
+        currentTimeout = setTimeout(animateNextChange, 180);
         return;
       }
 
@@ -582,36 +588,27 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
       const totalSteps = Math.max(change.from.length, change.to.length);
       let step = 0;
 
-      const interval = setInterval(() => {
+      currentInterval = setInterval(() => {
         step += 1;
 
         const incoming = change.to.slice(0, step);
         const outgoing = change.from.slice(step);
         displayText = prefix + incoming + outgoing + suffix;
 
-        const tempHighlights = [...highlights];
-        renderText(displayText, tempHighlights);
+        renderText(displayText, highlights);
 
         if (step >= totalSteps) {
-          clearInterval(interval);
+          clearInterval(currentInterval);
+          currentInterval = null;
 
           displayText = prefix + change.to + suffix;
-          highlights = [
-            ...highlights,
-            {
-              start,
-              end: start + change.to.length,
-              from: change.from,
-              to: change.to,
-              why: change.why
-            }
-          ];
+          highlights = [...highlights, change];
 
           currentStep += 1;
           renderText(displayText, highlights);
           updateProgress();
 
-          setTimeout(() => {
+          currentTimeout = setTimeout(() => {
             animateNextChange();
           }, 220);
         }
@@ -619,12 +616,16 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
     }
 
     improveBtn.addEventListener('click', () => {
-      if (isAnimating) return;
+      if (currentInterval) clearInterval(currentInterval);
+      if (currentTimeout) clearTimeout(currentTimeout);
+
       displayText = originalText;
       highlights = [];
       currentStep = 0;
       started = true;
       finished = false;
+      isAnimating = false;
+
       switchPhoto(true);
       renderText(displayText, highlights);
       updateProgress();
@@ -632,12 +633,16 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
     });
 
     resetBtn.addEventListener('click', () => {
+      if (currentInterval) clearInterval(currentInterval);
+      if (currentTimeout) clearTimeout(currentTimeout);
+
       displayText = originalText;
       highlights = [];
       currentStep = 0;
       started = false;
       finished = false;
       isAnimating = false;
+
       switchPhoto(false);
       renderText(displayText, highlights);
       updateProgress();
