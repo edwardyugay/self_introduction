@@ -1,474 +1,553 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Sparkles, User, Wand2 } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Self Introduction with Chat Gpt</title>
 
-type Change = {
-  from: string;
-  to: string;
-  why: string;
-};
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-type Highlight = Change & {
-  start: number;
-  end: number;
-};
+  <style>
+    html, body, #root {
+      min-height: 100%;
+      margin: 0;
+    }
+    body {
+      background:
+        radial-gradient(circle at top, #164e63, transparent 25%),
+        linear-gradient(180deg, #020617 0%, #0f172a 45%, #020617 100%);
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
 
-type ActiveTyping = Change & {
-  start: number;
-  prefix: string;
-  suffix: string;
-  morphStep: number;
-};
+  <script type="text/babel">
+    const { useEffect, useMemo, useState } = React;
+    const { AnimatePresence, motion } = Motion;
 
-const originalText = `My name is Eduard Yugay, and I am a second-year student at Korea Aerospace University, studying Flight Operations. I am pursuing a career in aviation because I am interested in working in high-responsibility and safety-critical environments. During my studies, I am developing both technical knowledge and a disciplined mindset that are important for becoming a professional pilot. My background in IT and Quality Assurance helps me think in a structured way and pay attention to details, which I believe is important in aviation. I see flight operations as a system where people, technology, and procedures must work together effectively.
+    const originalText = `My name is Eduard Yugay, and I am a second-year student at Korea Aerospace University, studying Flight Operations.
 
-My academic experience so far has helped me build a strong foundation in aviation-related subjects. I have studied aviation safety, basic aerospace concepts, mathematics, and physics. These subjects helped me understand how aviation systems work. Currently, I am studying aviation meteorology, aircraft systems, and ATC communication. These subjects are important for understanding real flight operations and decision-making. I am also improving my English skills to be able to communicate in an international aviation environment. In addition, I have experience with Basic Aviation Training Device (BATD), where I practice flight scenarios and apply what I learn in class. I am also studying Human Factors and Safety Management Systems, which help me understand how pilots make decisions and manage risks.
+I am pursuing a career in aviation because I am interested in working in high-responsibility and safety-critical environments.
 
-Outside of my studies, I participate in an international Christian community in Korea. Through this community, I take part in group activities and meet people from different backgrounds. I also had opportunities to communicate with aviation professionals, including employees of Korean Air. These interactions helped me better understand the aviation industry and career paths. In addition, this experience improves my communication skills, especially in a multicultural environment.
+During my studies, I am developing both technical knowledge and a disciplined mindset that are important for becoming a professional pilot.
 
-I am focused on continuous self-improvement and developing the discipline required in aviation. I work on improving my knowledge, communication skills, and ability to stay calm under pressure. As a second-year student, I understand that I am still at the early stage of my training, so I try to use my time effectively through studying, simulator practice, and self-development. I aim to build strong habits that will help me in my future career.
+My background in IT and Quality Assurance helps me think in a structured way and pay attention to details, which I believe is important in aviation.
 
-My goal is to become a commercial pilot and build a stable and responsible career in aviation. I plan to continue my training, gain flight experience, and improve both my technical and non-technical skills. In the future, I would also like to use my background in IT and Quality Assurance to contribute to safer and more efficient aviation systems.
+I see flight operations as a system where people, technology, and procedures must work together effectively.
 
-In conclusion, I am building my path in aviation step by step through my studies, training, and personal development. I am motivated to continue learning and improving in order to become a responsible and reliable pilot.`;
+My academic experience so far has helped me build a strong foundation in aviation-related subjects.
 
-const changes: Change[] = [
-  {
-    from: 'a second-year student at Korea Aerospace University, studying Flight Operations',
-    to: 'a second-year Flight Operations student at Korea Aerospace University',
-    why: 'This version is more concise and sounds more natural in academic self-introductions.',
-  },
-  {
-    from: 'I am interested in working in high-responsibility and safety-critical environments',
-    to: 'I am drawn to environments where responsibility, discipline, and safety are essential',
-    why: 'The revised phrasing sounds more professional and emphasizes motivation more clearly.',
-  },
-  {
-    from: 'a disciplined mindset that are important for becoming a professional pilot',
-    to: 'the disciplined mindset required for a professional pilot',
-    why: 'This fixes the grammar issue and makes the sentence more precise and polished.',
-  },
-  {
-    from: 'helps me think in a structured way and pay attention to details, which I believe is important in aviation',
-    to: 'has taught me to think in a structured way and pay close attention to detail, which is essential in aviation',
-    why: 'The new version improves tense consistency, collocation, and formality.',
-  },
-  {
-    from: 'My academic experience so far has helped me build a strong foundation in aviation-related subjects',
-    to: 'My academic experience has provided me with a solid foundation in aviation-related subjects',
-    why: 'This sounds more formal and academically appropriate.',
-  },
-  {
-    from: 'These subjects are important for understanding real flight operations and decision-making',
-    to: 'these subjects are directly related to real flight operations and pilot decision-making',
-    why: 'The improved wording is more specific and connects the subjects directly to pilot performance.',
-  },
-  {
-    from: 'I have experience with Basic Aviation Training Device (BATD)',
-    to: 'I have gained practical experience using a Basic Aviation Training Device (BATD)',
-    why: 'This highlights applied training and sounds stronger in a professional context.',
-  },
-  {
-    from: 'which help me understand how pilots make decisions and manage risks',
-    to: 'which have strengthened my understanding of pilot decision-making and risk management',
-    why: 'The revised form is more formal and uses stronger academic phrasing.',
-  },
-  {
-    from: 'I participate in an international Christian community in Korea',
-    to: 'I take part in an international Christian community in Korea',
-    why: 'This phrasing is slightly more natural and fluid in formal self-introductions.',
-  },
-  {
-    from: 'meet people from different backgrounds',
-    to: 'interact with people from diverse cultural backgrounds',
-    why: 'This sounds more specific, global, and professional.',
-  },
-  {
-    from: 'These interactions helped me better understand the aviation industry and career paths',
-    to: 'which has broadened my understanding of the aviation industry, career development, and professional expectations',
-    why: 'The revised wording expands the idea and sounds more mature and analytical.',
-  },
-  {
-    from: 'I am focused on continuous self-improvement',
-    to: 'I am committed to continuous improvement',
-    why: 'Committed is stronger and more intentional than focused in this context.',
-  },
-  {
-    from: 'I work on improving my knowledge, communication skills, and ability to stay calm under pressure',
-    to: 'I consistently work on strengthening my technical knowledge, communication skills, and ability to remain calm under pressure',
-    why: 'This improves precision, professionalism, and rhythm.',
-  },
-  {
-    from: 'I am still at the early stage of my training, so I try to use my time effectively through studying, simulator practice, and self-development',
-    to: 'I am still in the early stage of my training, which is why I try to use my time productively through academic study, simulator practice, and steady self-development',
-    why: 'The revised sentence has better flow, better word choice, and a more polished structure.',
-  },
-  {
-    from: 'build a stable and responsible career in aviation',
-    to: 'build a career defined by responsibility, safety, and reliability',
-    why: 'This makes the goal statement more distinctive and aligned with aviation values.',
-  },
-  {
-    from: 'improve both my technical and non-technical skills',
-    to: 'further develop both my technical and non-technical competencies',
-    why: 'Competencies is a stronger and more professional term in academic and aviation contexts.',
-  },
-  {
-    from: 'In the future',
-    to: 'In the long term',
-    why: 'This sounds more strategic and professional.',
-  },
-  {
-    from: 'In conclusion, I am building my path in aviation step by step through my studies, training, and personal development',
-    to: 'Overall, I am building my future in aviation through academic study, practical training, and continuous personal development',
-    why: 'The revised closing is more confident, polished, and cohesive.',
-  },
-  {
-    from: 'I am motivated to continue learning and improving in order to become a responsible and reliable pilot',
-    to: 'With a structured mindset, a strong sense of responsibility, and a commitment to safety, I am working steadily toward becoming a reliable and professional pilot',
-    why: 'This creates a stronger final impression and reinforces your key qualities more effectively.',
-  },
-];
+I have studied aviation safety, basic aerospace concepts, mathematics, and physics. These subjects helped me understand how aviation systems work.
 
-const finalImprovedText = `My name is Eduard Yugay, and I am a second-year Flight Operations student at Korea Aerospace University. I am pursuing a career in aviation because I am drawn to environments where responsibility, discipline, and safety are essential. During my studies, I am developing both technical knowledge and the disciplined mindset required for a professional pilot. My background in IT and Quality Assurance has taught me to think in a structured way and pay close attention to detail, which is essential in aviation. I see flight operations as a complex system in which people, technology, and procedures must work together effectively.
+Currently, I am studying aviation meteorology, aircraft systems, and ATC communication. These subjects are important for understanding real flight operations and decision-making.
 
-My academic experience has provided me with a solid foundation in aviation-related subjects. In the early stage of my studies, I focused on aviation safety, basic aerospace concepts, mathematics, and physics, which helped me understand the fundamental principles of aviation systems. Currently, I am focusing on aviation meteorology, aircraft systems, and ATC communication, which are directly related to real flight operations and pilot decision-making. I am also improving my English skills to communicate effectively in an international aviation environment. In addition, I have gained practical experience using a Basic Aviation Training Device (BATD), where I practice flight scenarios and apply theoretical knowledge in simulated situations. I am also studying Human Factors and Safety Management Systems, which have strengthened my understanding of pilot decision-making and risk management.
+I am also improving my English skills to be able to communicate in an international aviation environment.
 
-Outside of my academic studies, I take part in an international Christian community in Korea, where I participate in group activities and interact with people from diverse cultural backgrounds. This experience has helped me develop stronger communication and interpersonal skills in a multicultural environment. I have also had opportunities to communicate with aviation professionals, including employees of Korean Air, which has broadened my understanding of the aviation industry, career development, and professional expectations. I believe this experience is valuable in aviation, where effective communication and teamwork are directly related to safety and operational performance.
+In addition, I have experience with Basic Aviation Training Device (BATD), where I practice flight scenarios and apply what I learn in class.
 
-I am committed to continuous improvement and to developing the discipline required in aviation. I consistently work on strengthening my technical knowledge, communication skills, and ability to remain calm under pressure. As a second-year student, I understand that I am still in the early stage of my training, which is why I try to use my time productively through academic study, simulator practice, and steady self-development. My goal is to build the habits, responsibility, and consistency that will support my future performance as a pilot.
+I am also studying Human Factors and Safety Management Systems, which help me understand how pilots make decisions and manage risks.
 
-My goal is to become a commercial pilot and build a career defined by responsibility, safety, and reliability. I plan to continue my training, gain flight experience, and further develop both my technical and non-technical competencies. In the long term, I would like to combine my aviation training with my background in IT and Quality Assurance to contribute to safer, more efficient, and more reliable aviation systems.
+Outside of my studies, I participate in an international Christian community in Korea.
 
-Overall, I am building my future in aviation through academic study, practical training, and continuous personal development. With a structured mindset, a strong sense of responsibility, and a commitment to safety, I am working steadily toward becoming a reliable and professional pilot.`;
+Through this community, I take part in group activities and meet people from different backgrounds.
 
-function buildFinalHighlights(text: string, items: Change[]): Highlight[] {
-  const results: Highlight[] = [];
-  let searchFrom = 0;
+I also had opportunities to communicate with aviation professionals, including employees of Korean Air.
 
-  items.forEach((item) => {
-    const start = text.indexOf(item.to, searchFrom);
-    if (start === -1) return;
+These interactions helped me better understand the aviation industry and career paths.
 
-    results.push({
-      start,
-      end: start + item.to.length,
-      from: item.from,
-      to: item.to,
-      why: item.why,
-    });
+In addition, this experience improves my communication skills, especially in a multicultural environment.
 
-    searchFrom = start + item.to.length;
-  });
+I am focused on continuous self-improvement and developing the discipline required in aviation.
 
-  return results;
-}
+I work on improving my knowledge, communication skills, and ability to stay calm under pressure.
 
-const finalHighlights = buildFinalHighlights(finalImprovedText, changes);
+As a second-year student, I understand that I am still at the early stage of my training, so I try to use my time effectively through studying, simulator practice, and self-development.
 
-// Put your real images into /public folder of your project
-// public/before.jpg and public/after.jpg
-const beforePhoto = '/before.jpg';
-const afterPhoto = '/after.jpg';
+I aim to build strong habits that will help me in my future career.
 
-function prepareTypingChange(text: string, change: Change): Omit<ActiveTyping, 'morphStep'> | null {
-  const start = text.indexOf(change.from);
-  if (start === -1) return null;
+My goal is to become a commercial pilot and build a stable and responsible career in aviation.
 
-  return {
-    start,
-    prefix: text.slice(0, start),
-    suffix: text.slice(start + change.from.length),
-    from: change.from,
-    to: change.to,
-    why: change.why,
-  };
-}
+I plan to continue my training, gain flight experience, and improve both my technical and non-technical skills.
 
-function renderHighlightedText(
-  text: string,
-  highlights: Highlight[],
-  hoveredId: string | null,
-  setHoveredId: (id: string | null) => void,
-) {
-  const paragraphs = text.split('\n\n');
-  let globalOffset = 0;
+In the future, I would also like to use my background in IT and Quality Assurance to contribute to safer and more efficient aviation systems.
 
-  return paragraphs.map((paragraph, pIndex) => {
-    const paragraphStart = globalOffset;
-    const paragraphEnd = paragraphStart + paragraph.length;
-    const paragraphHighlights = highlights
-      .filter((h) => h.start < paragraphEnd && h.end > paragraphStart)
-      .map((h) => ({
-        ...h,
-        localStart: Math.max(0, h.start - paragraphStart),
-        localEnd: Math.min(paragraph.length, h.end - paragraphStart),
-      }))
-      .sort((a, b) => a.localStart - b.localStart);
+In conclusion, I am building my path in aviation step by step through my studies, training, and personal development.
 
-    const parts: React.ReactNode[] = [];
-    let cursor = 0;
-    const openAbove = pIndex >= paragraphs.length - 2;
+I am motivated to continue learning and improving in order to become a responsible and reliable pilot.`;
 
-    if (!paragraphHighlights.length) {
-      globalOffset += paragraph.length + 2;
-      return (
-        <p key={`paragraph-${pIndex}`} className="mb-6 indent-8 text-[17px] leading-9 text-slate-200 last:mb-0">
-          {paragraph}
-        </p>
-      );
+    const finalImprovedText = `My name is Eduard Yugay, and I am a second-year Flight Operations student at Korea Aerospace University.
+
+I am pursuing a career in aviation because I am drawn to environments where responsibility, discipline, and safety are essential.
+
+During my studies, I am developing both technical knowledge and the disciplined mindset required for a professional pilot.
+
+My background in IT and Quality Assurance has taught me to think in a structured way and pay close attention to detail, which is essential in aviation.
+
+I see flight operations as a complex system in which people, technology, and procedures must work together effectively.
+
+My academic experience has provided me with a solid foundation in aviation-related subjects.
+
+In the early stage of my studies, I focused on aviation safety, basic aerospace concepts, mathematics, and physics, which helped me understand the fundamental principles of aviation systems.
+
+Currently, I am focusing on aviation meteorology, aircraft systems, and ATC communication, which are directly related to real flight operations and pilot decision-making.
+
+I am also improving my English skills to communicate effectively in an international aviation environment.
+
+In addition, I have gained practical experience using a Basic Aviation Training Device (BATD), where I practice flight scenarios and apply theoretical knowledge in simulated situations.
+
+I am also studying Human Factors and Safety Management Systems, which have strengthened my understanding of pilot decision-making and risk management.
+
+Outside of my academic studies, I take part in an international Christian community in Korea, where I participate in group activities and interact with people from diverse cultural backgrounds.
+
+This experience has helped me develop stronger communication and interpersonal skills in a multicultural environment.
+
+I have also had opportunities to communicate with aviation professionals, including employees of Korean Air, which has broadened my understanding of the aviation industry, career development, and professional expectations.
+
+I believe this experience is valuable in aviation, where effective communication and teamwork are directly related to safety and operational performance.
+
+I am committed to continuous improvement and to developing the discipline required in aviation.
+
+I consistently work on strengthening my technical knowledge, communication skills, and ability to remain calm under pressure.
+
+As a second-year student, I understand that I am still in the early stage of my training, which is why I try to use my time productively through academic study, simulator practice, and steady self-development.
+
+My goal is to build the habits, responsibility, and consistency that will support my future performance as a pilot.
+
+My goal is to become a commercial pilot and build a career defined by responsibility, safety, and reliability.
+
+I plan to continue my training, gain flight experience, and further develop both my technical and non-technical competencies.
+
+In the long term, I would like to combine my aviation training with my background in IT and Quality Assurance to contribute to safer, more efficient, and more reliable aviation systems.
+
+Overall, I am building my future in aviation through academic study, practical training, and continuous personal development.
+
+With a structured mindset, a strong sense of responsibility, and a commitment to safety, I am working steadily toward becoming a reliable and professional pilot.`;
+
+    const changes = [
+      {
+        from: 'a second-year student at Korea Aerospace University, studying Flight Operations',
+        to: 'a second-year Flight Operations student at Korea Aerospace University',
+        why: 'More concise and more natural in an academic self-introduction.'
+      },
+      {
+        from: 'I am interested in working in high-responsibility and safety-critical environments',
+        to: 'I am drawn to environments where responsibility, discipline, and safety are essential',
+        why: 'Stronger and more professional phrasing.'
+      },
+      {
+        from: 'a disciplined mindset that are important for becoming a professional pilot',
+        to: 'the disciplined mindset required for a professional pilot',
+        why: 'Fixes grammar and improves precision.'
+      },
+      {
+        from: 'helps me think in a structured way and pay attention to details, which I believe is important in aviation',
+        to: 'has taught me to think in a structured way and pay close attention to detail, which is essential in aviation',
+        why: 'Better tense consistency, collocation, and formality.'
+      },
+      {
+        from: 'My academic experience so far has helped me build a strong foundation in aviation-related subjects',
+        to: 'My academic experience has provided me with a solid foundation in aviation-related subjects',
+        why: 'More formal and academically appropriate.'
+      },
+      {
+        from: 'These subjects are important for understanding real flight operations and decision-making',
+        to: 'these subjects are directly related to real flight operations and pilot decision-making',
+        why: 'More specific and directly tied to aviation performance.'
+      },
+      {
+        from: 'I have experience with Basic Aviation Training Device (BATD)',
+        to: 'I have gained practical experience using a Basic Aviation Training Device (BATD)',
+        why: 'Emphasizes practical experience.'
+      },
+      {
+        from: 'which help me understand how pilots make decisions and manage risks',
+        to: 'which have strengthened my understanding of pilot decision-making and risk management',
+        why: 'More formal and precise phrasing.'
+      },
+      {
+        from: 'I participate in an international Christian community in Korea',
+        to: 'I take part in an international Christian community in Korea',
+        why: 'Smoother and more natural phrasing.'
+      },
+      {
+        from: 'meet people from different backgrounds',
+        to: 'interact with people from diverse cultural backgrounds',
+        why: 'More professional and specific wording.'
+      },
+      {
+        from: 'These interactions helped me better understand the aviation industry and career paths',
+        to: 'which has broadened my understanding of the aviation industry, career development, and professional expectations',
+        why: 'More mature and analytical phrasing.'
+      },
+      {
+        from: 'I am focused on continuous self-improvement',
+        to: 'I am committed to continuous improvement',
+        why: 'Committed sounds stronger and more intentional.'
+      },
+      {
+        from: 'I work on improving my knowledge, communication skills, and ability to stay calm under pressure',
+        to: 'I consistently work on strengthening my technical knowledge, communication skills, and ability to remain calm under pressure',
+        why: 'More precise and professional.'
+      },
+      {
+        from: 'I am still at the early stage of my training, so I try to use my time effectively through studying, simulator practice, and self-development',
+        to: 'I am still in the early stage of my training, which is why I try to use my time productively through academic study, simulator practice, and steady self-development',
+        why: 'Better flow and more polished structure.'
+      },
+      {
+        from: 'build a stable and responsible career in aviation',
+        to: 'build a career defined by responsibility, safety, and reliability',
+        why: 'More distinctive and aligned with aviation values.'
+      },
+      {
+        from: 'improve both my technical and non-technical skills',
+        to: 'further develop both my technical and non-technical competencies',
+        why: 'Competencies is a stronger professional term.'
+      },
+      {
+        from: 'In the future',
+        to: 'In the long term',
+        why: 'Sounds more strategic and professional.'
+      },
+      {
+        from: 'In conclusion, I am building my path in aviation step by step through my studies, training, and personal development',
+        to: 'Overall, I am building my future in aviation through academic study, practical training, and continuous personal development',
+        why: 'More confident and cohesive closing.'
+      },
+      {
+        from: 'I am motivated to continue learning and improving in order to become a responsible and reliable pilot',
+        to: 'With a structured mindset, a strong sense of responsibility, and a commitment to safety, I am working steadily toward becoming a reliable and professional pilot',
+        why: 'Creates a much stronger final impression.'
+      }
+    ];
+
+    function buildFinalHighlights(text, items) {
+      const results = [];
+      let searchFrom = 0;
+      items.forEach((item) => {
+        const start = text.indexOf(item.to, searchFrom);
+        if (start === -1) return;
+        results.push({
+          start,
+          end: start + item.to.length,
+          from: item.from,
+          to: item.to,
+          why: item.why
+        });
+        searchFrom = start + item.to.length;
+      });
+      return results;
     }
 
-    paragraphHighlights.forEach((h, index) => {
-      if (cursor < h.localStart) {
-        parts.push(
-          <span key={`plain-${pIndex}-${index}-${cursor}`}>{paragraph.slice(cursor, h.localStart)}</span>,
+    const finalHighlights = buildFinalHighlights(finalImprovedText, changes);
+    const beforePhoto = './before.jpg';
+    const afterPhoto = './after.jpg';
+
+    function prepareTypingChange(text, change) {
+      const start = text.indexOf(change.from);
+      if (start === -1) return null;
+      return {
+        start,
+        prefix: text.slice(0, start),
+        suffix: text.slice(start + change.from.length),
+        from: change.from,
+        to: change.to,
+        why: change.why
+      };
+    }
+
+    function renderHighlightedText(text, highlights, hoveredId, setHoveredId) {
+      const paragraphs = text.split('\\n\\n');
+      let globalOffset = 0;
+
+      return paragraphs.map((paragraph, pIndex) => {
+        const paragraphStart = globalOffset;
+        const paragraphEnd = paragraphStart + paragraph.length;
+        const paragraphHighlights = highlights
+          .filter((h) => h.start < paragraphEnd && h.end > paragraphStart)
+          .map((h) => ({
+            ...h,
+            localStart: Math.max(0, h.start - paragraphStart),
+            localEnd: Math.min(paragraph.length, h.end - paragraphStart)
+          }))
+          .sort((a, b) => a.localStart - b.localStart);
+
+        const parts = [];
+        let cursor = 0;
+        const openAbove = pIndex >= paragraphs.length - 2;
+
+        if (!paragraphHighlights.length) {
+          globalOffset += paragraph.length + 2;
+          return (
+            <p key={`paragraph-${pIndex}`} className="mb-6 indent-8 text-[17px] leading-9 text-slate-200 last:mb-0">
+              {paragraph}
+            </p>
+          );
+        }
+
+        paragraphHighlights.forEach((h, index) => {
+          if (cursor < h.localStart) {
+            parts.push(
+              <span key={`plain-${pIndex}-${index}-${cursor}`}>
+                {paragraph.slice(cursor, h.localStart)}
+              </span>
+            );
+          }
+
+          const highlightId = `${pIndex}-${index}`;
+          const tooltipPositionClass = openAbove ? 'bottom-[115%] top-auto' : 'top-[115%] bottom-auto';
+
+          parts.push(
+            <span
+              key={`highlight-${pIndex}-${index}-${h.localStart}`}
+              className="group relative inline rounded-md bg-gradient-to-r from-teal-400/30 via-cyan-400/30 to-sky-400/30 px-1.5 py-0.5 text-white ring-1 ring-cyan-300/50 transition hover:from-teal-300/40 hover:via-cyan-300/40 hover:to-sky-300/40 hover:ring-cyan-200"
+              onMouseEnter={() => setHoveredId(highlightId)}
+              onMouseLeave={() => setHoveredId(null)}
+            >
+              {paragraph.slice(h.localStart, h.localEnd)}
+              <AnimatePresence>
+                {hoveredId === highlightId && (
+                  <motion.div
+                    initial={{ opacity: 0, y: openAbove ? 6 : -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: openAbove ? 6 : -6 }}
+                    transition={{ duration: 0.18 }}
+                    className={`absolute left-1/2 z-20 w-[min(26rem,calc(100vw-3rem))] -translate-x-1/2 rounded-2xl border border-cyan-200/10 bg-slate-950/95 p-4 text-sm text-slate-200 shadow-2xl ${tooltipPositionClass}`}
+                  >
+                    <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                      Why this is better
+                    </div>
+                    <div className="mb-2 rounded-xl bg-white/5 p-2">
+                      <div className="mb-1 text-xs text-slate-400">Original</div>
+                      <div className="break-words text-rose-200">{h.from}</div>
+                    </div>
+                    <div className="mb-2 rounded-xl bg-white/5 p-2">
+                      <div className="mb-1 text-xs text-slate-400">Improved</div>
+                      <div className="break-words text-cyan-200">{h.to}</div>
+                    </div>
+                    <div className="break-words leading-6 text-slate-300">{h.why}</div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </span>
+          );
+
+          cursor = h.localEnd;
+        });
+
+        if (cursor < paragraph.length) {
+          parts.push(<span key={`tail-${pIndex}-${cursor}`}>{paragraph.slice(cursor)}</span>);
+        }
+
+        globalOffset += paragraph.length + 2;
+
+        return (
+          <p key={`paragraph-${pIndex}`} className="mb-6 indent-8 text-[17px] leading-9 text-slate-200 last:mb-0">
+            {parts}
+          </p>
         );
-      }
-
-      const highlightId = `${pIndex}-${index}`;
-      const tooltipPositionClass = openAbove ? 'bottom-[115%] top-auto' : 'top-[115%] bottom-auto';
-
-      parts.push(
-        <span
-          key={`highlight-${pIndex}-${index}-${h.localStart}`}
-          className="group relative inline rounded-md bg-gradient-to-r from-teal-400/30 via-cyan-400/30 to-sky-400/30 px-1.5 py-0.5 text-white ring-1 ring-cyan-300/50 transition hover:from-teal-300/40 hover:via-cyan-300/40 hover:to-sky-300/40 hover:ring-cyan-200"
-          onMouseEnter={() => setHoveredId(highlightId)}
-          onMouseLeave={() => setHoveredId(null)}
-        >
-          {paragraph.slice(h.localStart, h.localEnd)}
-          <AnimatePresence>
-            {hoveredId === highlightId && (
-              <motion.div
-                initial={{ opacity: 0, y: openAbove ? 6 : -6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: openAbove ? 6 : -6 }}
-                transition={{ duration: 0.18 }}
-                className={`absolute left-1/2 z-20 w-[min(26rem,calc(100vw-3rem))] -translate-x-1/2 rounded-2xl border border-cyan-200/10 bg-slate-950/95 p-4 text-sm text-slate-200 shadow-2xl ${tooltipPositionClass}`}
-              >
-                <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
-                  Why this is better
-                </div>
-                <div className="mb-2 rounded-xl bg-white/5 p-2">
-                  <div className="mb-1 text-xs text-slate-400">Original</div>
-                  <div className="break-words text-rose-200">{h.from}</div>
-                </div>
-                <div className="mb-2 rounded-xl bg-white/5 p-2">
-                  <div className="mb-1 text-xs text-slate-400">Improved</div>
-                  <div className="break-words text-cyan-200">{h.to}</div>
-                </div>
-                <div className="break-words leading-6 text-slate-300">{h.why}</div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </span>,
-      );
-
-      cursor = h.localEnd;
-    });
-
-    if (cursor < paragraph.length) {
-      parts.push(<span key={`tail-${pIndex}-${cursor}`}>{paragraph.slice(cursor)}</span>);
+      });
     }
 
-    globalOffset += paragraph.length + 2;
+    function App() {
+      const [displayText, setDisplayText] = useState(originalText);
+      const [started, setStarted] = useState(false);
+      const [finished, setFinished] = useState(false);
+      const [currentStep, setCurrentStep] = useState(0);
+      const [highlights, setHighlights] = useState([]);
+      const [hoveredId, setHoveredId] = useState(null);
+      const [activeTyping, setActiveTyping] = useState(null);
+      const [showAfterPhoto, setShowAfterPhoto] = useState(false);
 
-    return (
-      <p key={`paragraph-${pIndex}`} className="mb-6 indent-8 text-[17px] leading-9 text-slate-200 last:mb-0">
-        {parts}
-      </p>
-    );
-  });
-}
+      useEffect(() => {
+        if (!started || finished || activeTyping) return;
 
-export default function EssayImproverPage() {
-  const [displayText, setDisplayText] = useState<string>(originalText);
-  const [started, setStarted] = useState(false);
-  const [finished, setFinished] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [highlights, setHighlights] = useState<Highlight[]>([]);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [activeTyping, setActiveTyping] = useState<ActiveTyping | null>(null);
-  const [showAfterPhoto, setShowAfterPhoto] = useState(false);
+        if (currentStep >= changes.length) {
+          setFinished(true);
+          setDisplayText(finalImprovedText);
+          setHighlights(finalHighlights);
+          setActiveTyping(null);
+          return;
+        }
 
-  useEffect(() => {
-    if (!started || finished || activeTyping) return;
+        const timer = window.setTimeout(() => {
+          const prepared = prepareTypingChange(displayText, changes[currentStep]);
+          if (!prepared) {
+            setCurrentStep((prev) => prev + 1);
+            return;
+          }
+          setActiveTyping({ ...prepared, morphStep: 0 });
+        }, 900);
 
-    if (currentStep >= changes.length) {
-      setFinished(true);
-      setDisplayText(finalImprovedText);
-      setHighlights(finalHighlights);
-      setActiveTyping(null);
-      return;
-    }
+        return () => window.clearTimeout(timer);
+      }, [started, finished, currentStep, displayText, activeTyping]);
 
-    const timer = window.setTimeout(() => {
-      const prepared = prepareTypingChange(displayText, changes[currentStep]);
-      if (!prepared) {
-        setCurrentStep((prev) => prev + 1);
-        return;
-      }
+      useEffect(() => {
+        if (!activeTyping || finished) return;
 
-      setActiveTyping({ ...prepared, morphStep: 0 });
-    }, 900);
+        const totalSteps = Math.max(activeTyping.from.length, activeTyping.to.length);
 
-    return () => window.clearTimeout(timer);
-  }, [started, finished, currentStep, displayText, activeTyping]);
+        if (activeTyping.morphStep >= totalSteps) {
+          const applied = {
+            start: activeTyping.start,
+            end: activeTyping.start + activeTyping.to.length,
+            from: activeTyping.from,
+            to: activeTyping.to,
+            why: activeTyping.why
+          };
 
-  useEffect(() => {
-    if (!activeTyping || finished) return;
+          setDisplayText(activeTyping.prefix + activeTyping.to + activeTyping.suffix);
+          setHighlights((prev) => [...prev, applied]);
+          setActiveTyping(null);
+          setCurrentStep((prev) => prev + 1);
+          return;
+        }
 
-    const totalSteps = Math.max(activeTyping.from.length, activeTyping.to.length);
+        const timer = window.setTimeout(() => {
+          const nextStep = activeTyping.morphStep + 1;
+          const incoming = activeTyping.to.slice(0, nextStep);
+          const outgoing = activeTyping.from.slice(nextStep);
+          const nextText = activeTyping.prefix + incoming + outgoing + activeTyping.suffix;
+          const normalizedText =
+            nextStep >= totalSteps ? activeTyping.prefix + activeTyping.to + activeTyping.suffix : nextText;
 
-    if (activeTyping.morphStep >= totalSteps) {
-      const applied: Highlight = {
-        start: activeTyping.start,
-        end: activeTyping.start + activeTyping.to.length,
-        from: activeTyping.from,
-        to: activeTyping.to,
-        why: activeTyping.why,
+          setDisplayText(normalizedText);
+          setActiveTyping((prev) => (prev ? { ...prev, morphStep: nextStep } : prev));
+        }, 40);
+
+        return () => window.clearTimeout(timer);
+      }, [activeTyping, finished]);
+
+      const progress = useMemo(() => Math.round((currentStep / changes.length) * 100), [currentStep]);
+
+      const handleImprove = () => {
+        setDisplayText(originalText);
+        setHighlights([]);
+        setCurrentStep(0);
+        setFinished(false);
+        setStarted(true);
+        setActiveTyping(null);
+        setShowAfterPhoto(true);
       };
 
-      setDisplayText(activeTyping.prefix + activeTyping.to + activeTyping.suffix);
-      setHighlights((prev) => [...prev, applied]);
-      setActiveTyping(null);
-      setCurrentStep((prev) => prev + 1);
-      return;
-    }
+      const handleReset = () => {
+        setStarted(false);
+        setFinished(false);
+        setCurrentStep(0);
+        setHighlights([]);
+        setDisplayText(originalText);
+        setActiveTyping(null);
+        setShowAfterPhoto(false);
+      };
 
-    const timer = window.setTimeout(() => {
-      const nextStep = activeTyping.morphStep + 1;
-      const incoming = activeTyping.to.slice(0, nextStep);
-      const outgoing = activeTyping.from.slice(nextStep);
-      const nextText = activeTyping.prefix + incoming + outgoing + activeTyping.suffix;
-      const normalizedText =
-        nextStep >= totalSteps ? activeTyping.prefix + activeTyping.to + activeTyping.suffix : nextText;
-
-      setDisplayText(normalizedText);
-      setActiveTyping((prev) => (prev ? { ...prev, morphStep: nextStep } : prev));
-    }, 40);
-
-    return () => window.clearTimeout(timer);
-  }, [activeTyping, finished]);
-
-  const progress = useMemo(() => Math.round((currentStep / changes.length) * 100), [currentStep]);
-
-  const handleImprove = () => {
-    setDisplayText(originalText);
-    setHighlights([]);
-    setCurrentStep(0);
-    setFinished(false);
-    setStarted(true);
-    setActiveTyping(null);
-    setShowAfterPhoto(true);
-  };
-
-  const handleReset = () => {
-    setStarted(false);
-    setFinished(false);
-    setCurrentStep(0);
-    setHighlights([]);
-    setDisplayText(originalText);
-    setActiveTyping(null);
-    setShowAfterPhoto(false);
-  };
-
-  return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#164e63,transparent_25%),linear-gradient(180deg,#020617_0%,#0f172a_45%,#020617_100%)] text-white">
-      <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 overflow-hidden rounded-[30px] border border-white/10 bg-white/5 backdrop-blur-sm"
-        >
-          <div className="grid gap-6 md:grid-cols-[1.05fr_0.95fr]">
-            <div className="p-8 md:p-10">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-300">
-                <Sparkles size={14} /> Self Introduction with Chat Gpt
-              </div>
-              <h1 className="mb-4 text-3xl font-bold leading-tight md:text-5xl">
-                Self Introduction with Chat Gpt
-              </h1>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <button
-                  onClick={handleImprove}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-sky-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-sky-300"
-                >
-                  <Wand2 size={18} /> Improve
-                </button>
-                <button
-                  onClick={handleReset}
-                  className="rounded-2xl border border-white/10 px-6 py-3 font-semibold text-slate-200 transition hover:border-slate-400"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-
-            <div className="p-6 md:p-8">
-              <div className="rounded-[24px] border border-white/10 bg-slate-950/50 p-5 shadow-2xl">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="rounded-2xl bg-sky-400/15 p-3 text-sky-300">
-                    <User size={22} />
+      return (
+        <div className="min-h-screen bg-[radial-gradient(circle_at_top,#164e63,transparent_25%),linear-gradient(180deg,#020617_0%,#0f172a_45%,#020617_100%)] text-white">
+          <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8 overflow-hidden rounded-[30px] border border-white/10 bg-white/5 backdrop-blur-sm"
+            >
+              <div className="grid gap-6 md:grid-cols-[1.05fr_0.95fr]">
+                <div className="p-8 md:p-10">
+                  <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-300">
+                    <Sparkles size={14} /> Self Introduction with Chat Gpt
                   </div>
+                  <h1 className="mb-4 text-3xl font-bold leading-tight md:text-5xl">
+                    Self Introduction with Chat Gpt
+                  </h1>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <button
+                      onClick={handleImprove}
+                      className="inline-flex items-center gap-2 rounded-2xl bg-sky-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-sky-300"
+                    >
+                      <Wand2 size={18} /> Improve
+                    </button>
+                    <button
+                      onClick={handleReset}
+                      className="rounded-2xl border border-white/10 px-6 py-3 font-semibold text-slate-200 transition hover:border-slate-400"
+                    >
+                      Reset
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-6 md:p-8">
+                  <div className="rounded-[24px] border border-white/10 bg-slate-950/50 p-5 shadow-2xl">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="rounded-2xl bg-sky-400/15 p-3 text-sky-300">
+                        <User size={22} />
+                      </div>
+                      <div>
+                        <div className="text-lg font-semibold">Eduard Yugay</div>
+                        <div className="text-sm text-slate-400">Flight Operations Student</div>
+                      </div>
+                    </div>
+                    <div className="overflow-hidden rounded-[22px] border border-cyan-300/20 bg-white/5">
+                      <AnimatePresence mode="wait">
+                        <motion.img
+                          key={showAfterPhoto ? 'after-photo' : 'before-photo'}
+                          src={showAfterPhoto ? afterPhoto : beforePhoto}
+                          alt={showAfterPhoto ? 'Improved portrait' : 'Portrait'}
+                          className="h-72 w-full object-cover"
+                          initial={{ opacity: 0, scale: 1.04 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.98 }}
+                          transition={{ duration: 0.6, ease: 'easeInOut' }}
+                        />
+                      </AnimatePresence>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <div className="grid gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+              >
+                <div className="mb-4 flex items-center justify-between gap-4">
                   <div>
-                    <div className="text-lg font-semibold">Eduard Yugay</div>
-                    <div className="text-sm text-slate-400">Flight Operations Student</div>
+                    <div className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+                      Live Essay View
+                    </div>
+                    <h2 className="text-2xl font-bold md:text-3xl">Original → Improved</h2>
+                  </div>
+                  <div className="rounded-2xl bg-slate-950/50 px-4 py-2 text-sm text-slate-300">
+                    {started ? (finished ? 'Improvement complete' : `Improving... ${progress}%`) : 'Ready to improve'}
                   </div>
                 </div>
-                <div className="overflow-hidden rounded-[22px] border border-cyan-300/20 bg-white/5">
-                  <AnimatePresence mode="wait">
-                    <motion.img
-                      key={showAfterPhoto ? 'after-photo' : 'before-photo'}
-                      src={showAfterPhoto ? afterPhoto : beforePhoto}
-                      alt={showAfterPhoto ? 'Improved portrait' : 'Portrait'}
-                      className="h-72 w-full object-cover"
-                      initial={{ opacity: 0, scale: 1.04 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.98 }}
-                      transition={{ duration: 0.6, ease: 'easeInOut' }}
-                    />
-                  </AnimatePresence>
+
+                <div className="mb-5 h-3 overflow-hidden rounded-full bg-slate-800">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${started ? progress : 0}%` }}
+                    className="h-full rounded-full bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-500"
+                  />
                 </div>
-              </div>
+
+                <div className="min-h-[760px] rounded-[24px] border border-white/10 bg-slate-950/45 p-8 md:p-10">
+                  <div className="relative overflow-visible">
+                    {renderHighlightedText(displayText, highlights, hoveredId, setHoveredId)}
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </div>
-        </motion.div>
-
-        <div className="grid gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
-          >
-            <div className="mb-4 flex items-center justify-between gap-4">
-              <div>
-                <div className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
-                  Live Essay View
-                </div>
-                <h2 className="text-2xl font-bold md:text-3xl">Original → Improved</h2>
-              </div>
-              <div className="rounded-2xl bg-slate-950/50 px-4 py-2 text-sm text-slate-300">
-                {started ? (finished ? 'Improvement complete' : `Improving... ${progress}%`) : 'Ready to improve'}
-              </div>
-            </div>
-
-            <div className="mb-5 h-3 overflow-hidden rounded-full bg-slate-800">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${started ? progress : 0}%` }}
-                className="h-full rounded-full bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-500"
-              />
-            </div>
-
-            <div className="min-h-[760px] rounded-[24px] border border-white/10 bg-slate-950/45 p-8 md:p-10">
-              <div className="relative overflow-visible">
-                {renderHighlightedText(displayText, highlights, hoveredId, setHoveredId)}
-              </div>
-            </div>
-          </motion.div>
         </div>
-      </div>
-    </div>
-  );
-}
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+  <script src="https://unpkg.com/framer-motion/dist/framer-motion.js"></script>
+</body>
+</html>
