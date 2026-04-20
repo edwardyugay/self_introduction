@@ -3,34 +3,240 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Self Introduction with Chat Gpt</title>
+  <title>Self Introduction with Chat GPT</title>
 
-  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
-    html, body, #root {
-      min-height: 100%;
+    html, body {
       margin: 0;
-    }
-    body {
+      min-height: 100%;
+      font-family: Arial, sans-serif;
       background:
         radial-gradient(circle at top, #164e63, transparent 25%),
         linear-gradient(180deg, #020617 0%, #0f172a 45%, #020617 100%);
       color: white;
-      font-family: Arial, sans-serif;
+    }
+
+    .page {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 16px;
+    }
+
+    .card {
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(8px);
+      border-radius: 30px;
+    }
+
+    .photo {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .photo.fade {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+
+    .btn {
+      border: none;
+      border-radius: 18px;
+      padding: 14px 24px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #38bdf8;
+      color: #020617;
+    }
+
+    .btn-primary:hover {
+      background: #7dd3fc;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #e2e8f0;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .btn-secondary:hover {
+      border-color: #94a3b8;
+    }
+
+    .text-box {
+      min-height: 760px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(2,6,23,0.45);
+      padding: 32px 40px;
+      position: relative;
+    }
+
+    .paragraph {
+      margin: 0 0 24px 0;
+      text-indent: 2rem;
+      font-size: 17px;
+      line-height: 2.1;
+      color: #e2e8f0;
+    }
+
+    .highlight {
+      position: relative;
+      display: inline;
+      border-radius: 6px;
+      padding: 2px 6px;
+      background: linear-gradient(to right, rgba(45,212,191,0.3), rgba(34,211,238,0.3), rgba(56,189,248,0.3));
+      box-shadow: inset 0 0 0 1px rgba(103,232,249,0.35);
+    }
+
+    .tooltip {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      width: min(26rem, calc(100vw - 3rem));
+      background: rgba(2,6,23,0.96);
+      border: 1px solid rgba(103,232,249,0.12);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+      display: none;
+      text-indent: 0;
+      white-space: normal;
+    }
+
+    .tooltip.top {
+      bottom: 115%;
+    }
+
+    .tooltip.bottom {
+      top: 115%;
+    }
+
+    .highlight:hover .tooltip {
+      display: block;
+    }
+
+    .muted {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .rose {
+      color: #fecdd3;
+      word-break: break-word;
+    }
+
+    .cyan {
+      color: #a5f3fc;
+      word-break: break-word;
+    }
+
+    .desc {
+      color: #cbd5e1;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .progress-wrap {
+      height: 12px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #2dd4bf, #22d3ee, #38bdf8);
+      transition: width 0.4s ease;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .text-box {
+        padding: 24px 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div class="page">
+    <div class="card" style="margin-bottom: 32px; overflow: hidden;">
+      <div class="hero-grid" style="display:grid; grid-template-columns:1.05fr 0.95fr; gap:24px;">
+        <div style="padding:32px 40px;">
+          <div style="margin-bottom:12px; display:inline-flex; align-items:center; gap:8px; border-radius:999px; border:1px solid rgba(56,189,248,0.3); background:rgba(56,189,248,0.1); padding:6px 12px; font-size:12px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:#7dd3fc;">
+            Self Introduction with Chat GPT
+          </div>
 
-  <script type="text/babel">
-    const { useEffect, useMemo, useState } = React;
-    const { AnimatePresence, motion } = Motion;
+          <h1 style="margin:0 0 16px 0; font-size:clamp(32px,5vw,54px); line-height:1.1; font-weight:800;">
+            Self Introduction with Chat GPT
+          </h1>
 
+          <div style="margin-top:24px; display:flex; gap:12px; flex-wrap:wrap;">
+            <button id="improveBtn" class="btn btn-primary">Improve</button>
+            <button id="resetBtn" class="btn btn-secondary">Reset</button>
+          </div>
+        </div>
+
+        <div style="padding:24px 32px;">
+          <div style="border-radius:24px; border:1px solid rgba(255,255,255,0.1); background:rgba(2,6,23,0.5); padding:20px; box-shadow:0 25px 60px rgba(0,0,0,0.35);">
+            <div style="margin-bottom:16px; display:flex; align-items:center; gap:12px;">
+              <div style="border-radius:18px; background:rgba(56,189,248,0.15); padding:12px; color:#7dd3fc;">👤</div>
+              <div>
+                <div style="font-size:18px; font-weight:700;">Eduard Yugay</div>
+                <div style="font-size:14px; color:#94a3b8;">Flight Operations Student</div>
+              </div>
+            </div>
+
+            <div style="overflow:hidden; border-radius:22px; border:1px solid rgba(103,232,249,0.2); background:rgba(255,255,255,0.05);">
+              <img id="profilePhoto" src="./before.jpg" alt="Portrait" class="photo" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:24px;">
+      <div style="margin-bottom:16px; display:flex; justify-content:space-between; gap:16px; align-items:center;">
+        <div>
+          <div style="margin-bottom:4px; font-size:12px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:#67e8f9;">
+            Live Essay View
+          </div>
+          <h2 style="margin:0; font-size:clamp(24px,3vw,36px); font-weight:800;">
+            Original → Improved
+          </h2>
+        </div>
+
+        <div id="statusText" style="border-radius:18px; background:rgba(2,6,23,0.5); padding:10px 16px; font-size:14px; color:#cbd5e1;">
+          Ready to improve
+        </div>
+      </div>
+
+      <div class="progress-wrap">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <div class="text-box">
+        <div id="essayContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
     const originalText = `My name is Eduard Yugay, and I am a second-year student at Korea Aerospace University, studying Flight Operations.
 
 I am pursuing a career in aviation because I am interested in working in high-responsibility and safety-critical environments.
@@ -227,6 +433,23 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
       }
     ];
 
+    const beforePhoto = './before.jpg';
+    const afterPhoto = './after.jpg';
+
+    const essayContainer = document.getElementById('essayContainer');
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+    const improveBtn = document.getElementById('improveBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const profilePhoto = document.getElementById('profilePhoto');
+
+    let displayText = originalText;
+    let currentStep = 0;
+    let started = false;
+    let finished = false;
+    let hoveredId = null;
+    let highlights = [];
+
     function buildFinalHighlights(text, items) {
       const results = [];
       let searchFrom = 0;
@@ -246,8 +469,6 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
     }
 
     const finalHighlights = buildFinalHighlights(finalImprovedText, changes);
-    const beforePhoto = './before.jpg';
-    const afterPhoto = './after.jpg';
 
     function prepareTypingChange(text, change) {
       const start = text.indexOf(change.from);
@@ -258,296 +479,170 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
         suffix: text.slice(start + change.from.length),
         from: change.from,
         to: change.to,
-        why: change.why
+        why: change.why,
+        morphStep: 0
       };
     }
 
-    function renderHighlightedText(text, highlights, hoveredId, setHoveredId) {
+    function escapeHtml(str) {
+      return str
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function renderText(text, useHighlights = true) {
       const paragraphs = text.split('\\n\\n');
       let globalOffset = 0;
 
-      return paragraphs.map((paragraph, pIndex) => {
+      essayContainer.innerHTML = paragraphs.map((paragraph, pIndex) => {
         const paragraphStart = globalOffset;
         const paragraphEnd = paragraphStart + paragraph.length;
-        const paragraphHighlights = highlights
-          .filter((h) => h.start < paragraphEnd && h.end > paragraphStart)
-          .map((h) => ({
-            ...h,
-            localStart: Math.max(0, h.start - paragraphStart),
-            localEnd: Math.min(paragraph.length, h.end - paragraphStart)
-          }))
-          .sort((a, b) => a.localStart - b.localStart);
+        const paragraphHighlights = useHighlights
+          ? highlights
+              .filter((h) => h.start < paragraphEnd && h.end > paragraphStart)
+              .map((h) => ({
+                ...h,
+                localStart: Math.max(0, h.start - paragraphStart),
+                localEnd: Math.min(paragraph.length, h.end - paragraphStart)
+              }))
+              .sort((a, b) => a.localStart - b.localStart)
+          : [];
 
-        const parts = [];
+        let html = '';
         let cursor = 0;
         const openAbove = pIndex >= paragraphs.length - 2;
 
-        if (!paragraphHighlights.length) {
-          globalOffset += paragraph.length + 2;
-          return (
-            <p key={`paragraph-${pIndex}`} className="mb-6 indent-8 text-[17px] leading-9 text-slate-200 last:mb-0">
-              {paragraph}
-            </p>
-          );
-        }
-
-        paragraphHighlights.forEach((h, index) => {
+        paragraphHighlights.forEach((h) => {
           if (cursor < h.localStart) {
-            parts.push(
-              <span key={`plain-${pIndex}-${index}-${cursor}`}>
-                {paragraph.slice(cursor, h.localStart)}
-              </span>
-            );
+            html += escapeHtml(paragraph.slice(cursor, h.localStart));
           }
 
-          const highlightId = `${pIndex}-${index}`;
-          const tooltipPositionClass = openAbove ? 'bottom-[115%] top-auto' : 'top-[115%] bottom-auto';
+          const tooltipPos = openAbove ? 'top' : 'bottom';
 
-          parts.push(
-            <span
-              key={`highlight-${pIndex}-${index}-${h.localStart}`}
-              className="group relative inline rounded-md bg-gradient-to-r from-teal-400/30 via-cyan-400/30 to-sky-400/30 px-1.5 py-0.5 text-white ring-1 ring-cyan-300/50 transition hover:from-teal-300/40 hover:via-cyan-300/40 hover:to-sky-300/40 hover:ring-cyan-200"
-              onMouseEnter={() => setHoveredId(highlightId)}
-              onMouseLeave={() => setHoveredId(null)}
-            >
-              {paragraph.slice(h.localStart, h.localEnd)}
-              <AnimatePresence>
-                {hoveredId === highlightId && (
-                  <motion.div
-                    initial={{ opacity: 0, y: openAbove ? 6 : -6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: openAbove ? 6 : -6 }}
-                    transition={{ duration: 0.18 }}
-                    className={`absolute left-1/2 z-20 w-[min(26rem,calc(100vw-3rem))] -translate-x-1/2 rounded-2xl border border-cyan-200/10 bg-slate-950/95 p-4 text-sm text-slate-200 shadow-2xl ${tooltipPositionClass}`}
-                  >
-                    <div className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
-                      Why this is better
-                    </div>
-                    <div className="mb-2 rounded-xl bg-white/5 p-2">
-                      <div className="mb-1 text-xs text-slate-400">Original</div>
-                      <div className="break-words text-rose-200">{h.from}</div>
-                    </div>
-                    <div className="mb-2 rounded-xl bg-white/5 p-2">
-                      <div className="mb-1 text-xs text-slate-400">Improved</div>
-                      <div className="break-words text-cyan-200">{h.to}</div>
-                    </div>
-                    <div className="break-words leading-6 text-slate-300">{h.why}</div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+          html += `
+            <span class="highlight">
+              ${escapeHtml(paragraph.slice(h.localStart, h.localEnd))}
+              <span class="tooltip ${tooltipPos}">
+                <div class="muted">Why this is better</div>
+                <div style="margin-bottom:10px; border-radius:12px; background:rgba(255,255,255,0.05); padding:10px;">
+                  <div class="muted">Original</div>
+                  <div class="rose">${escapeHtml(h.from)}</div>
+                </div>
+                <div style="margin-bottom:10px; border-radius:12px; background:rgba(255,255,255,0.05); padding:10px;">
+                  <div class="muted">Improved</div>
+                  <div class="cyan">${escapeHtml(h.to)}</div>
+                </div>
+                <div class="desc">${escapeHtml(h.why)}</div>
+              </span>
             </span>
-          );
+          `;
 
           cursor = h.localEnd;
         });
 
         if (cursor < paragraph.length) {
-          parts.push(<span key={`tail-${pIndex}-${cursor}`}>{paragraph.slice(cursor)}</span>);
+          html += escapeHtml(paragraph.slice(cursor));
         }
 
         globalOffset += paragraph.length + 2;
-
-        return (
-          <p key={`paragraph-${pIndex}`} className="mb-6 indent-8 text-[17px] leading-9 text-slate-200 last:mb-0">
-            {parts}
-          </p>
-        );
-      });
+        return `<p class="paragraph">${html}</p>`;
+      }).join('');
     }
 
-    function App() {
-      const [displayText, setDisplayText] = useState(originalText);
-      const [started, setStarted] = useState(false);
-      const [finished, setFinished] = useState(false);
-      const [currentStep, setCurrentStep] = useState(0);
-      const [highlights, setHighlights] = useState([]);
-      const [hoveredId, setHoveredId] = useState(null);
-      const [activeTyping, setActiveTyping] = useState(null);
-      const [showAfterPhoto, setShowAfterPhoto] = useState(false);
-
-      useEffect(() => {
-        if (!started || finished || activeTyping) return;
-
-        if (currentStep >= changes.length) {
-          setFinished(true);
-          setDisplayText(finalImprovedText);
-          setHighlights(finalHighlights);
-          setActiveTyping(null);
-          return;
-        }
-
-        const timer = window.setTimeout(() => {
-          const prepared = prepareTypingChange(displayText, changes[currentStep]);
-          if (!prepared) {
-            setCurrentStep((prev) => prev + 1);
-            return;
-          }
-          setActiveTyping({ ...prepared, morphStep: 0 });
-        }, 900);
-
-        return () => window.clearTimeout(timer);
-      }, [started, finished, currentStep, displayText, activeTyping]);
-
-      useEffect(() => {
-        if (!activeTyping || finished) return;
-
-        const totalSteps = Math.max(activeTyping.from.length, activeTyping.to.length);
-
-        if (activeTyping.morphStep >= totalSteps) {
-          const applied = {
-            start: activeTyping.start,
-            end: activeTyping.start + activeTyping.to.length,
-            from: activeTyping.from,
-            to: activeTyping.to,
-            why: activeTyping.why
-          };
-
-          setDisplayText(activeTyping.prefix + activeTyping.to + activeTyping.suffix);
-          setHighlights((prev) => [...prev, applied]);
-          setActiveTyping(null);
-          setCurrentStep((prev) => prev + 1);
-          return;
-        }
-
-        const timer = window.setTimeout(() => {
-          const nextStep = activeTyping.morphStep + 1;
-          const incoming = activeTyping.to.slice(0, nextStep);
-          const outgoing = activeTyping.from.slice(nextStep);
-          const nextText = activeTyping.prefix + incoming + outgoing + activeTyping.suffix;
-          const normalizedText =
-            nextStep >= totalSteps ? activeTyping.prefix + activeTyping.to + activeTyping.suffix : nextText;
-
-          setDisplayText(normalizedText);
-          setActiveTyping((prev) => (prev ? { ...prev, morphStep: nextStep } : prev));
-        }, 40);
-
-        return () => window.clearTimeout(timer);
-      }, [activeTyping, finished]);
-
-      const progress = useMemo(() => Math.round((currentStep / changes.length) * 100), [currentStep]);
-
-      const handleImprove = () => {
-        setDisplayText(originalText);
-        setHighlights([]);
-        setCurrentStep(0);
-        setFinished(false);
-        setStarted(true);
-        setActiveTyping(null);
-        setShowAfterPhoto(true);
-      };
-
-      const handleReset = () => {
-        setStarted(false);
-        setFinished(false);
-        setCurrentStep(0);
-        setHighlights([]);
-        setDisplayText(originalText);
-        setActiveTyping(null);
-        setShowAfterPhoto(false);
-      };
-
-      return (
-        <div className="min-h-screen bg-[radial-gradient(circle_at_top,#164e63,transparent_25%),linear-gradient(180deg,#020617_0%,#0f172a_45%,#020617_100%)] text-white">
-          <div className="mx-auto max-w-[1600px] px-4 py-8 md:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-8 overflow-hidden rounded-[30px] border border-white/10 bg-white/5 backdrop-blur-sm"
-            >
-              <div className="grid gap-6 md:grid-cols-[1.05fr_0.95fr]">
-                <div className="p-8 md:p-10">
-                  <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-sky-300">
-                    <Sparkles size={14} /> Self Introduction with Chat Gpt
-                  </div>
-                  <h1 className="mb-4 text-3xl font-bold leading-tight md:text-5xl">
-                    Self Introduction with Chat Gpt
-                  </h1>
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <button
-                      onClick={handleImprove}
-                      className="inline-flex items-center gap-2 rounded-2xl bg-sky-400 px-6 py-3 font-semibold text-slate-950 transition hover:bg-sky-300"
-                    >
-                      <Wand2 size={18} /> Improve
-                    </button>
-                    <button
-                      onClick={handleReset}
-                      className="rounded-2xl border border-white/10 px-6 py-3 font-semibold text-slate-200 transition hover:border-slate-400"
-                    >
-                      Reset
-                    </button>
-                  </div>
-                </div>
-
-                <div className="p-6 md:p-8">
-                  <div className="rounded-[24px] border border-white/10 bg-slate-950/50 p-5 shadow-2xl">
-                    <div className="mb-4 flex items-center gap-3">
-                      <div className="rounded-2xl bg-sky-400/15 p-3 text-sky-300">
-                        <User size={22} />
-                      </div>
-                      <div>
-                        <div className="text-lg font-semibold">Eduard Yugay</div>
-                        <div className="text-sm text-slate-400">Flight Operations Student</div>
-                      </div>
-                    </div>
-                    <div className="overflow-hidden rounded-[22px] border border-cyan-300/20 bg-white/5">
-                      <AnimatePresence mode="wait">
-                        <motion.img
-                          key={showAfterPhoto ? 'after-photo' : 'before-photo'}
-                          src={showAfterPhoto ? afterPhoto : beforePhoto}
-                          alt={showAfterPhoto ? 'Improved portrait' : 'Portrait'}
-                          className="h-72 w-full object-cover"
-                          initial={{ opacity: 0, scale: 1.04 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.98 }}
-                          transition={{ duration: 0.6, ease: 'easeInOut' }}
-                        />
-                      </AnimatePresence>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
-            <div className="grid gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
-              >
-                <div className="mb-4 flex items-center justify-between gap-4">
-                  <div>
-                    <div className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
-                      Live Essay View
-                    </div>
-                    <h2 className="text-2xl font-bold md:text-3xl">Original → Improved</h2>
-                  </div>
-                  <div className="rounded-2xl bg-slate-950/50 px-4 py-2 text-sm text-slate-300">
-                    {started ? (finished ? 'Improvement complete' : `Improving... ${progress}%`) : 'Ready to improve'}
-                  </div>
-                </div>
-
-                <div className="mb-5 h-3 overflow-hidden rounded-full bg-slate-800">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${started ? progress : 0}%` }}
-                    className="h-full rounded-full bg-gradient-to-r from-teal-400 via-cyan-400 to-sky-500"
-                  />
-                </div>
-
-                <div className="min-h-[760px] rounded-[24px] border border-white/10 bg-slate-950/45 p-8 md:p-10">
-                  <div className="relative overflow-visible">
-                    {renderHighlightedText(displayText, highlights, hoveredId, setHoveredId)}
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      );
+    function updateProgress() {
+      const progress = Math.round((currentStep / changes.length) * 100);
+      progressBar.style.width = (started ? progress : 0) + '%';
+      statusText.textContent = started
+        ? (finished ? 'Improvement complete' : `Improving... ${progress}%`)
+        : 'Ready to improve';
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    function switchPhoto(after) {
+      profilePhoto.classList.add('fade');
+      setTimeout(() => {
+        profilePhoto.src = after ? afterPhoto : beforePhoto;
+        profilePhoto.classList.remove('fade');
+      }, 300);
+    }
+
+    function animateChanges() {
+      if (!started || finished) return;
+
+      if (currentStep >= changes.length) {
+        finished = true;
+        displayText = finalImprovedText;
+        highlights = finalHighlights;
+        renderText(displayText, true);
+        updateProgress();
+        return;
+      }
+
+      const prepared = prepareTypingChange(displayText, changes[currentStep]);
+      if (!prepared) {
+        currentStep += 1;
+        updateProgress();
+        setTimeout(animateChanges, 200);
+        return;
+      }
+
+      const totalSteps = Math.max(prepared.from.length, prepared.to.length);
+      let step = 0;
+
+      const interval = setInterval(() => {
+        step += 1;
+        const incoming = prepared.to.slice(0, step);
+        const outgoing = prepared.from.slice(step);
+        displayText = prepared.prefix + incoming + outgoing + prepared.suffix;
+        renderText(displayText, false);
+
+        if (step >= totalSteps) {
+          clearInterval(interval);
+
+          displayText = prepared.prefix + prepared.to + prepared.suffix;
+          highlights.push({
+            start: prepared.start,
+            end: prepared.start + prepared.to.length,
+            from: prepared.from,
+            to: prepared.to,
+            why: prepared.why
+          });
+
+          currentStep += 1;
+          renderText(displayText, true);
+          updateProgress();
+          setTimeout(animateChanges, 250);
+        }
+      }, 40);
+    }
+
+    improveBtn.addEventListener('click', () => {
+      displayText = originalText;
+      highlights = [];
+      currentStep = 0;
+      started = true;
+      finished = false;
+      switchPhoto(true);
+      renderText(displayText, false);
+      updateProgress();
+      animateChanges();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      displayText = originalText;
+      highlights = [];
+      currentStep = 0;
+      started = false;
+      finished = false;
+      switchPhoto(false);
+      renderText(displayText, false);
+      updateProgress();
+    });
+
+    renderText(displayText, false);
+    updateProgress();
   </script>
-  <script src="https://unpkg.com/framer-motion/dist/framer-motion.js"></script>
 </body>
 </html>
