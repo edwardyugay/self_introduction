@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Self Introduction with Chat GPT</title>
-
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     html, body {
@@ -86,6 +85,7 @@
       font-size: 17px;
       line-height: 2.1;
       color: #e2e8f0;
+      white-space: normal;
     }
 
     .highlight {
@@ -447,8 +447,17 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
     let currentStep = 0;
     let started = false;
     let finished = false;
-    let hoveredId = null;
     let highlights = [];
+    let isAnimating = false;
+
+    function escapeHtml(str) {
+      return str
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
 
     function buildFinalHighlights(text, items) {
       const results = [];
@@ -470,46 +479,29 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
 
     const finalHighlights = buildFinalHighlights(finalImprovedText, changes);
 
-    function prepareTypingChange(text, change) {
-      const start = text.indexOf(change.from);
-      if (start === -1) return null;
-      return {
-        start,
-        prefix: text.slice(0, start),
-        suffix: text.slice(start + change.from.length),
-        from: change.from,
-        to: change.to,
-        why: change.why,
-        morphStep: 0
-      };
+    function switchPhoto(after) {
+      profilePhoto.classList.add('fade');
+      setTimeout(() => {
+        profilePhoto.src = after ? afterPhoto : beforePhoto;
+        profilePhoto.classList.remove('fade');
+      }, 300);
     }
 
-    function escapeHtml(str) {
-      return str
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function renderText(text, useHighlights = true) {
-      const paragraphs = text.split('\\n\\n');
+    function renderText(text, activeHighlights) {
+      const paragraphs = text.split('\n\n');
       let globalOffset = 0;
 
       essayContainer.innerHTML = paragraphs.map((paragraph, pIndex) => {
         const paragraphStart = globalOffset;
         const paragraphEnd = paragraphStart + paragraph.length;
-        const paragraphHighlights = useHighlights
-          ? highlights
-              .filter((h) => h.start < paragraphEnd && h.end > paragraphStart)
-              .map((h) => ({
-                ...h,
-                localStart: Math.max(0, h.start - paragraphStart),
-                localEnd: Math.min(paragraph.length, h.end - paragraphStart)
-              }))
-              .sort((a, b) => a.localStart - b.localStart)
-          : [];
+        const paragraphHighlights = activeHighlights
+          .filter((h) => h.start < paragraphEnd && h.end > paragraphStart)
+          .map((h) => ({
+            ...h,
+            localStart: Math.max(0, h.start - paragraphStart),
+            localEnd: Math.min(paragraph.length, h.end - paragraphStart)
+          }))
+          .sort((a, b) => a.localStart - b.localStart);
 
         let html = '';
         let cursor = 0;
@@ -560,74 +552,83 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
         : 'Ready to improve';
     }
 
-    function switchPhoto(after) {
-      profilePhoto.classList.add('fade');
-      setTimeout(() => {
-        profilePhoto.src = after ? afterPhoto : beforePhoto;
-        profilePhoto.classList.remove('fade');
-      }, 300);
-    }
-
-    function animateChanges() {
+    function animateNextChange() {
       if (!started || finished) return;
 
       if (currentStep >= changes.length) {
         finished = true;
         displayText = finalImprovedText;
-        highlights = finalHighlights;
-        renderText(displayText, true);
+        highlights = [...finalHighlights];
+        renderText(displayText, highlights);
         updateProgress();
+        isAnimating = false;
         return;
       }
 
-      const prepared = prepareTypingChange(displayText, changes[currentStep]);
-      if (!prepared) {
+      const change = changes[currentStep];
+      const start = displayText.indexOf(change.from);
+
+      if (start === -1) {
         currentStep += 1;
         updateProgress();
-        setTimeout(animateChanges, 200);
+        setTimeout(animateNextChange, 180);
         return;
       }
 
-      const totalSteps = Math.max(prepared.from.length, prepared.to.length);
+      isAnimating = true;
+
+      const prefix = displayText.slice(0, start);
+      const suffix = displayText.slice(start + change.from.length);
+      const totalSteps = Math.max(change.from.length, change.to.length);
       let step = 0;
 
       const interval = setInterval(() => {
         step += 1;
-        const incoming = prepared.to.slice(0, step);
-        const outgoing = prepared.from.slice(step);
-        displayText = prepared.prefix + incoming + outgoing + prepared.suffix;
-        renderText(displayText, false);
+
+        const incoming = change.to.slice(0, step);
+        const outgoing = change.from.slice(step);
+        displayText = prefix + incoming + outgoing + suffix;
+
+        const tempHighlights = [...highlights];
+        renderText(displayText, tempHighlights);
 
         if (step >= totalSteps) {
           clearInterval(interval);
 
-          displayText = prepared.prefix + prepared.to + prepared.suffix;
-          highlights.push({
-            start: prepared.start,
-            end: prepared.start + prepared.to.length,
-            from: prepared.from,
-            to: prepared.to,
-            why: prepared.why
-          });
+          displayText = prefix + change.to + suffix;
+          highlights = [
+            ...highlights,
+            {
+              start,
+              end: start + change.to.length,
+              from: change.from,
+              to: change.to,
+              why: change.why
+            }
+          ];
 
           currentStep += 1;
-          renderText(displayText, true);
+          renderText(displayText, highlights);
           updateProgress();
-          setTimeout(animateChanges, 250);
+
+          setTimeout(() => {
+            animateNextChange();
+          }, 220);
         }
       }, 40);
     }
 
     improveBtn.addEventListener('click', () => {
+      if (isAnimating) return;
       displayText = originalText;
       highlights = [];
       currentStep = 0;
       started = true;
       finished = false;
       switchPhoto(true);
-      renderText(displayText, false);
+      renderText(displayText, highlights);
       updateProgress();
-      animateChanges();
+      animateNextChange();
     });
 
     resetBtn.addEventListener('click', () => {
@@ -636,12 +637,13 @@ With a structured mindset, a strong sense of responsibility, and a commitment to
       currentStep = 0;
       started = false;
       finished = false;
+      isAnimating = false;
       switchPhoto(false);
-      renderText(displayText, false);
+      renderText(displayText, highlights);
       updateProgress();
     });
 
-    renderText(displayText, false);
+    renderText(displayText, highlights);
     updateProgress();
   </script>
 </body>
